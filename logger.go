@@ -1,25 +1,19 @@
 package cloudlog
 
 import (
-	"context"
 	"fmt"
 
 	"cloud.google.com/go/logging"
 )
 
-// Logger is the logger to send logging information to Stackdrive console for your Google cloud project
+// Logger log information to Stackdrive console
 type Logger struct {
 	logger *logging.Logger
 }
 
-// Configure configures an returns the Stackdrive logger. Caller is responsible to guarantee the right permission to initialize the logging client
-func Configure(projectID string, loggerID string) (*Logger, error) {
-	ctx := context.Background()
-	client, err := logging.NewClient(ctx, projectID)
-	if err != nil {
-		return nil, err
-	}
-	return &Logger{logger: client.Logger(loggerID)}, nil
+// NewLogger constructs and returns a new logger object
+func NewLogger(client *logging.Client, name string) *Logger {
+	return &Logger{logger: client.Logger(name)}
 }
 
 func (l *Logger) output(payload string, severity logging.Severity) {

@@ -31,7 +31,7 @@ func (l *Logger) Debug(payload string) {
 
 // Debugf formats according to a format specifier and logs it
 func (l *Logger) Debugf(format string, v ...interface{}) {
-	l.Debug(fmt.Sprintf(format, v))
+	l.Debug(fmt.Sprintf(format, v...))
 }
 
 // Info logs the payload
@@ -41,7 +41,7 @@ func (l *Logger) Info(payload string) {
 
 // Infof formats according to a format specifier and logs it
 func (l *Logger) Infof(format string, v ...interface{}) {
-	l.Info(fmt.Sprintf(format, v))
+	l.Info(fmt.Sprintf(format, v...))
 }
 
 // Warning logs the payload
@@ -51,7 +51,7 @@ func (l *Logger) Warning(payload string) {
 
 // Warningf formats according to a format specifier and logs it
 func (l *Logger) Warningf(format string, v ...interface{}) {
-	l.Warning(fmt.Sprintf(format, v))
+	l.Warning(fmt.Sprintf(format, v...))
 }
 
 // Error logs the payload
@@ -61,7 +61,7 @@ func (l *Logger) Error(payload string) {
 
 // Errorf formats according to a format specifier and logs it
 func (l *Logger) Errorf(format string, v ...interface{}) {
-	l.Error(fmt.Sprintf(format, v))
+	l.Error(fmt.Sprintf(format, v...))
 }
 
 // Critical logs the payload
@@ -71,7 +71,7 @@ func (l *Logger) Critical(payload string) {
 
 // Criticalf formats according to a format specifier and logs it
 func (l *Logger) Criticalf(format string, v ...interface{}) {
-	l.Critical(fmt.Sprintf(format, v))
+	l.Critical(fmt.Sprintf(format, v...))
 }
 
 // Alert logs the payload
@@ -81,7 +81,7 @@ func (l *Logger) Alert(payload string) {
 
 // Alertf formats according to a format specifier and logs it
 func (l *Logger) Alertf(format string, v ...interface{}) {
-	l.Alert(fmt.Sprintf(format, v))
+	l.Alert(fmt.Sprintf(format, v...))
 }
 
 // Emergency logs the payload
@@ -91,5 +91,5 @@ func (l *Logger) Emergency(payload string) {
 
 // Emergencyf formats according to a format specifier and logs it
 func (l *Logger) Emergencyf(format string, v ...interface{}) {
-	l.Emergency(fmt.Sprintf(format, v))
+	l.Emergency(fmt.Sprintf(format, v...))
 }

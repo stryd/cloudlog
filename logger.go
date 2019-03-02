@@ -2,6 +2,7 @@ package cloudlog
 
 import (
 	"fmt"
+	"log"
 
 	"cloud.google.com/go/logging"
 )
@@ -9,11 +10,16 @@ import (
 // Logger log information to Stackdrive console
 type Logger struct {
 	logger *logging.Logger
+	local  bool
 }
 
 // NewLogger constructs and returns a new logger object
 func NewLogger(client *logging.Client, name string) *Logger {
-	return &Logger{logger: client.Logger(name)}
+	return &Logger{logger: client.Logger(name), local: false}
+}
+
+func (l *Logger) EnableLocal(flag bool) {
+	l.local = flag
 }
 
 func (l *Logger) output(payload string, severity logging.Severity) {
@@ -22,6 +28,9 @@ func (l *Logger) output(payload string, severity logging.Severity) {
 		Severity: severity,
 	}
 	l.logger.Log(e)
+	if l.local {
+		log.Printf("%v: %v", severity.String(), payload)
+	}
 }
 
 // Debug logs the payload

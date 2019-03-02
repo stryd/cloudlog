@@ -2,6 +2,7 @@ package cloudlog
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"sync"
@@ -22,6 +23,7 @@ type ScopedLogger struct {
 	traceID       string
 	startTime     time.Time
 	endTime       time.Time
+	local         bool
 }
 
 // NewScopedLogger constructs and returns a new ScopedLogger.
@@ -50,7 +52,12 @@ func NewScopedLogger(client *logging.Client, r *http.Request, name string) *Scop
 		traceID:       getTraceID(r),
 		startTime:     startTime,
 		endTime:       endTime,
+		local:         false,
 	}
+}
+
+func (l *ScopedLogger) EnableLocal(flag bool) {
+	l.local = flag
 }
 
 func (l *ScopedLogger) maxSeverity() logging.Severity {
@@ -71,6 +78,9 @@ func (l *ScopedLogger) output(payload string, severity logging.Severity) {
 	}
 	l.entryLogger.Log(e)
 	l.logSeverities = append(l.logSeverities, severity)
+	if l.local {
+		log.Printf("%v: %v", severity.String(), payload)
+	}
 }
 
 // Debug logs the payload

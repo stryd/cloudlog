@@ -12,6 +12,7 @@ import (
 
 	"cloud.google.com/go/compute/metadata"
 	"cloud.google.com/go/logging"
+	mrpb "google.golang.org/genproto/googleapis/api/monitoredres"
 )
 
 // ScopedLogger log information to Stackdrive console to be grouped based on the request
@@ -34,12 +35,18 @@ func NewScopedLogger(client *logging.Client, r *http.Request, name string) *Scop
 		// childFormat is a format string for a ScopedLogger's child log name.
 		childFormat = "%v-entry"
 	)
+	// To aggregate all logs under the same resource tab
+	customResource := &mrpb.MonitoredResource{
+		Type: "gce_instance",
+	}
 	parentLogger := client.Logger(
 		fmt.Sprintf(parentFormat, name),
+		logging.CommonResource(customResource),
 		logging.CommonLabels(WithHostname(nil)),
 	)
 	childLogger := client.Logger(
 		fmt.Sprintf(childFormat, name),
+		logging.CommonResource(customResource),
 		logging.CommonLabels(WithHostname(nil)),
 	)
 	startTime := time.Now()

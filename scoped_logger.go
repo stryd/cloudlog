@@ -8,8 +8,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/google/uuid"
-
 	"cloud.google.com/go/compute/metadata"
 	"cloud.google.com/go/logging"
 	mrpb "google.golang.org/genproto/googleapis/api/monitoredres"
@@ -21,7 +19,6 @@ type ScopedLogger struct {
 	parentLogger  *logging.Logger
 	request       *http.Request
 	logSeverities []logging.Severity
-	traceID       string
 	startTime     time.Time
 	endTime       time.Time
 	local         bool
@@ -56,7 +53,6 @@ func NewScopedLogger(client *logging.Client, r *http.Request, name string) *Scop
 		parentLogger:  parentLogger,
 		request:       r,
 		logSeverities: nil,
-		traceID:       getTraceID(r),
 		startTime:     startTime,
 		endTime:       endTime,
 		local:         false,
@@ -81,7 +77,6 @@ func (l *ScopedLogger) output(payload string, severity logging.Severity) {
 	e := logging.Entry{
 		Payload:  payload,
 		Severity: severity,
-		Trace:    l.traceID,
 	}
 	l.entryLogger.Log(e)
 	l.logSeverities = append(l.logSeverities, severity)
@@ -166,16 +161,9 @@ func (l *ScopedLogger) Finish() {
 	e := logging.Entry{
 		HTTPRequest: &logging.HTTPRequest{
 			Request: l.request,
-			//Status:  statusCode,
 			Latency: l.endTime.Sub(l.startTime),
+			//Status:  200,
 		},
-		/*
-			Operation: &logpb.LogEntryOperation{
-				Id:       appID,
-				Producer: "backend.stryd.com",
-			},
-		*/
-		Trace:    l.traceID,
 		Severity: l.maxSeverity(),
 	}
 	l.parentLogger.Log(e)
@@ -187,7 +175,6 @@ func (l *ScopedLogger) Finish() {
 // called for long running requests
 func (l *ScopedLogger) partialFinish() {
 	e := logging.Entry{
-		Trace:    l.traceID,
 		Severity: l.maxSeverity(),
 		HTTPRequest: &logging.HTTPRequest{
 			Request: l.request,
@@ -195,22 +182,6 @@ func (l *ScopedLogger) partialFinish() {
 	}
 
 	l.parentLogger.Log(e)
-}
-
-// getTraceID is an ID by which the group will be grouped in the Google
-// Cloud Logging console.
-//
-// If the `X-Cloud-Trace-Context` header is set in the request by GCP
-// middleware, then that trace ID is used.
-//
-// Otherwise, a pseudorandom UUID is used.
-func getTraceID(r *http.Request) string {
-	// If the trace header exists, use the trace.
-	if id := r.Header.Get("X-Cloud-Trace-Context"); id != "" {
-		return id
-	}
-	// Otherwise, generate a random group ID.
-	return uuid.New().String()
 }
 
 var detectedHost struct {

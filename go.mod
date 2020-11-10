@@ -1,6 +1,6 @@
 module github.com/stryd/cloudlog
 
-go 1.15
+go 1.14
 
 require (
 	cloud.google.com/go v0.71.0

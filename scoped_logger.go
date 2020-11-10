@@ -75,6 +75,9 @@ func (l *ScopedLogger) maxSeverity() logging.Severity {
 
 func (l *ScopedLogger) output(payload string, severity logging.Severity) {
 	e := logging.Entry{
+		HTTPRequest: &logging.HTTPRequest{
+			Request: l.request,
+		},
 		Payload:  payload,
 		Severity: severity,
 	}
